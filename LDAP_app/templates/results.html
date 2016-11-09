@@ -1,0 +1,63 @@
+{% extends 'home.html' %}
+{% block container %}
+	{% block page %}<h3>Results</h3>{% endblock page %}
+		{% block content %}
+			<table>
+			<tr>
+				<th>User Information</th>
+				<th></th>
+				<th>Public Notes</th>
+				<th>Private Notes</th>
+				<th></th>
+			</tr>
+			{% for user in g.user_info %}
+				{% if user != [] and user[1]['ssccAccountDeleted'][0]=='FALSE' %}
+				<tr>
+				<td>{{  user[1]['cn'][0]  }}<br>
+				Username: {{ user[1]['uid'][0] }}<br>
+				Member Status: {{  user[1]['ssccMemberStatus'][0]  }}<br>
+				Affiliations: {% for affil in user[1]['ssccAffiliation'] %}
+					{{ affil }}
+					{% endfor %}
+					<br><br>
+				</td>
+				<td>
+				</td>
+				<td>Test PubNote</td>
+				<td>Test PrivNote</td>
+				<td>
+				<form action="/sendmail" method='post'>
+					<div class="checkbox">
+						<label>
+							{% if g.user_info.__len__() > 1 %}
+							<input type="checkbox" name="checked" value="{{ user[1]['uid'][0] }}">
+							{% else %}
+							<input type="checkbox" name="checked" value="{{ user[1]['uid'][0] }}" checked>
+							{% endif %}
+						</label>
+					</div>
+				</td>
+				</tr>
+				{% endif %}
+			{% endfor %}
+			</table>
+			<br>
+			{% if g.affil.__len__() > 1 %}
+				<h4>Please choose which affiliation(s) to change:</h4>
+				{% for affil in g.affil %}
+					<input type="checkbox" name="affiliation" value="{{ affil }}">{{ affil }}</input>
+					<br>
+				{% endfor %}
+			{% else %}
+				{% for affil in g.affil %}
+					<input type="hidden" name="affiliation" value="{{ affil }}" checked></input>
+				{% endfor %}
+			{% endif %}
+			<br>
+				<button type="submit" name="submit" value="add" class="btn btn-default">Add Affiliation</button>
+				<button type="submit" name="submit" value="remove" class="btn btn-default">Remove Affiliation</button>
+			</form>
+	<p1><a href="{{ url_for('auth.search') }}">Back to search</a></p1>
+	<br><br>
+	{% endblock content %}
+{% endblock container %}

@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block container %}
+	<h1>SSCC Account Review Tool</h1>
+	{% if current_user.is_authenticated %}
+		<br>
+		<h3>Departments</h3>
+		<a href="{{ url_for('auth.age') }}">AGE</a><br>
+		<a href="{{ url_for('auth.cde') }}">CDE</a><br>
+		<a href="{{ url_for('auth.cdha') }}">CDHA</a><br>
+		<a href="{{ url_for('auth.cows') }}">COWS</a><br>
+		<a href="{{ url_for('auth.econ') }}">Economics</a><br>
+		<a href="{{ url_for('auth.irp') }}">IRP</a><br>
+		<a href="{{ url_for('auth.sociology') }}">Sociology</a><br>
+		<a href="{{ url_for('auth.sohe') }}">School of Human Ecology</a><br>
+		<a href="{{ url_for('auth.uwsc') }}">UW Survey Center</a><br>
+		<a href="{{ url_for('auth.wsob') }}">Wisconsin School of Business</a><br>
+		<br>
+		<h3>Tools</h3>
+		<a href="{{ url_for('auth.search') }}">Search By Username</a><br>
+		<a href="{{ url_for('auth.all_users') }}">See All Users</a><br>
+		<a href="{{ url_for('auth.logout') }}">Click here to logout</a>
+	{% else %}
+	<a href="{{ url_for('auth.login') }}">login</a>
+	{% endif %}
+{% endblock %}
