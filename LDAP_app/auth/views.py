@@ -94,7 +94,7 @@ def results():
 			else:
 				pass
 		except ldap.LDAPError, e:
-			print "LDAPError"
+			#print "LDAPError"
 			flash(e, 'danger')
 
 	return render_template('results.html', form=form)
@@ -146,21 +146,20 @@ def commitprivnote():
 	user_to_edit = request.form.get('username')
 	affil_to_edit = request.form.get('priv_affiliation')
 
-	print affil_to_edit
-	print note
+	#print affil_to_edit
+	#print note
 	user = PrivateNote.query.filter_by(username=user_to_edit, affiliation=affil_to_edit).first()
-	#private_username = PrivateNote.query.filter_by(username=user_to_edit).first()
 	try:
-		print 'trying'
+		#print 'trying'
 		if user.username == user_to_edit and user.affiliation == affil_to_edit:
-			print 'affil check'
+			#print 'affil check'
 			add_note = PrivateNote.query.filter_by(username=user_to_edit, affiliation=affil_to_edit).update(dict(private=note))
 		else:
-			print "adding"
+			#print "adding"
 			user_and_note = PrivateNote(user_to_edit, affil_to_edit, note) 
 			db.session.add(user_and_note)
 	except (AttributeError):
-		print 'except'
+		#print 'except'
 		user_and_note = PrivateNote(user_to_edit, affil_to_edit, note) 
 		db.session.add(user_and_note)
 	db.session.commit()
