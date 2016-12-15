@@ -1,0 +1,22 @@
+{% extends 'home.html' %}
+{% block container %}
+{% for user in g.user_info %}
+	{{  user[1]['cn'][0]  }}<br>
+	Username: {{ user[1]['uid'][0] }}<br>
+	Member Status: {{  user[1]['ssccMemberStatus'][0]  }}<br>
+	Affiliations: {% for affil in user[1]['ssccAffiliation'] %}
+		{{ affil }}
+		{% endfor %}<br>
+{% endfor %}
+<h4>Public Note</h4>
+<form action="/commitpubnote" method="post">
+{% for user in g.publicnote.query.filter_by(username=g.user_info[0][1]['uid'][0]) %}
+<textarea id="editing_public_form" name="editing_public_form" style="margin: 0px; height:100px; width:400px;">{{ user.public }}</textarea>
+{% else %}
+<textarea id="editing_public_form" name="editing_public_form" style="margin: 0px; height:100px; width:400px;"></textarea>
+{% endfor %}
+<br>
+<button type="submit" name="username" value="{{ g.user_info[0][1]['uid'][0] }}">Commit</button>
+</form>
+{% endblock %}
+

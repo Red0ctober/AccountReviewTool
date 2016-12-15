@@ -3,6 +3,7 @@ import functools
 from flask import g, session, redirect, current_app, request, url_for
 from flask_login import current_user
 from LDAP_app import db, app 
+from sqlalchemy import Column, Integer, String, ForeignKey
 
 ldap.set_option(ldap.OPT_X_TLS_REQUIRE_CERT, ldap.OPT_X_TLS_ALLOW)
 
@@ -35,6 +36,28 @@ class Login(db.Model):
 	def get_id(self):
 		return unicode(self.id)
 
+# Public notes that anyone can see and edit are here
+class PublicNote(db.Model):
+	id = Column(db.Integer, primary_key=True)
+	username = Column(db.String, unique=False)
+	public = Column(db.String)
+
+	def __init__(self, username, public):
+		self.username = username
+		self.public = public
+
+# Private notes that only users with the same affiliation can r/w are stored here
+class PrivateNote(db.Model):
+	id = Column(Integer, primary_key=True)
+	username = Column(db.String, unique=False)
+	affiliation = Column(db.String(10), unique=False)
+	private = Column(db.String)
+
+	def __init__(self, username, affiliation, private):
+		self.username = username
+		self.private = private
+		self.affiliation = affiliation
+
 class User(object):
 
 	def __init__(self, username):
@@ -49,38 +72,45 @@ class User(object):
 		filter = "uid=" + self.username
 		return self.conn.search_s('ou=People,dc=ssc,dc=wisc,dc=edu', ldap.SCOPE_SUBTREE, filter, ['mail'])[0][1]['mail'][0]
 
+	def get_name(self):
+		filter = "uid=" + self.username
+		return self.conn.search_s('ou=People,dc=ssc,dc=wisc,dc=edu', ldap.SCOPE_SUBTREE, filter, ['cn'])[0][1]['cn'][0]
+
 class Search:
 
 	def __init__(self, find):
 		user = User(current_user.username)
 		dn = 'ou=People,dc=ssc,dc=wisc,dc=edu'
-		attr = ['ssccMemberStatus', 'uid', 'mail', 'ssccAffiliation', 'cn', 'ssccAccountDeleted']
+		attr = ['ssccMemberStatus', 'uid', 'mail', 'ssccAffiliation', 'cn', 'ssccAccountDeleted', 'ssccAccountLocked']
 		filter = find
 		conn = get_ldap_connection()
 	
 		user_info = conn.search_s(dn, ldap.SCOPE_SUBTREE, filter, attr)
 		g.user_info = sorted(user_info, key=lambda user: user[1]['cn'][0]) #Sorts by user first name
 		g.affil = user.get_affiliation()
+		g.publicnote = PublicNote
+		g.privatenote = PrivateNote
 
 class SendMessage:
 
-	def __init__(self, sender, affiliation, action, users):
-		self.sender = sender
+	def __init__(self, sender, sender_name, affiliation, action, users):
+		self.sender_email = sender
+		self.sender_name = sender_name
 		self.affiliation = affiliation
 		self.action = action
 		self.users = users
-		receivers = ['ogiramma@ssc.wisc.edu']
+		receivers = ['ogiramma@ssc.wisc.edu', '%s' % self.sender_email]
 	
-		message = ("""From: Consult <%s> """ % self.sender +
+		message = ("""From: Consult <%s> """ % self.sender_email +
 """To: Oliver <ogiramma@ssc.wisc.edu>
 Subject: Test Email
 
-Please %s """ % self.action +
+%s has requested that the SSCC """ % self.sender_name + "%s " %  self.action +
 "the %s affiliation(s) on the account(s): " % ", ".join(self.affiliation) + "%s" % ', '.join(self.users))
 	
 		try:
 			smtpObj = smtplib.SMTP('localhost')
-			smtpObj.sendmail(self.sender, receivers, message)
+			smtpObj.sendmail(self.sender_email, receivers, message)
 		except:
 			print ("Error: unable to send")	
 

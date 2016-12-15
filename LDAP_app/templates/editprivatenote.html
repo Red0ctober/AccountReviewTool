@@ -1,0 +1,41 @@
+{% extends 'home.html' %}
+{% block container %}
+{% for user in g.user_info %}
+	{{  user[1]['cn'][0]  }}<br>
+	Username: {{ user[1]['uid'][0] }}<br>
+	Member Status: {{  user[1]['ssccMemberStatus'][0]  }}<br>
+	Affiliations: {% for affil in user[1]['ssccAffiliation'] %}
+		{{ affil }}
+		{% endfor %}<br>
+{% endfor %}
+<h4>Private Notes</h4>
+{% for affiliation in g.affil %}
+	{% for user in g.privatenote.query.filter_by(affiliation=affiliation, username=g.user_info[0][1]['uid'][0]) %}
+		{% if affiliation == user.affiliation and user.username == g.user_info[0][1]['uid'][0]  %}
+			{{ affiliation }}<br>
+<form action="/commitprivnote" method="post">
+<textarea id="editing_private_form" name="editing_private_form" style="margin: 0px; height:100px; width:400px;">{{ user.private }}</textarea><br>
+<input type='hidden' name='priv_affiliation' value="{{ affiliation }}" checked></input>
+<button type="submit" name="username" value="{{ g.user_info[0][1]['uid'][0] }}">Commit {{ affiliation }}</button><br>
+</form>
+		{% else %}
+			{{ affiliation }}<br>
+<form action="/commitprivnote" method="post">
+<textarea id="editing_private_form" name="editing_private_form" style="margin: 0px; height:100px; width:400px;"></textarea><br>
+<input type='hidden' name='priv_affiliation' value="{{ affiliation }}" checked></input>
+<button type="submit" name="username" value="{{ g.user_info[0][1]['uid'][0] }}">Commit {{ affiliation }}</button><br>
+</form>
+		{% endif %}
+	{% else %}
+		{{ affiliation }}<br>
+<form action="/commitprivnote" method="post">
+<textarea id="editing_private_form" name="editing_private_form" style="margin: 0px; height:100px; width:400px;"></textarea><br>
+<input type='hidden' name='priv_affiliation' value="{{ affiliation }}" checked></input>
+<button type="submit" name="username" value="{{ g.user_info[0][1]['uid'][0] }}">Commit {{ affiliation }}</button><br>
+</form>
+	{% endfor %}
+{% endfor %}
+<br>
+
+{% endblock %}
+

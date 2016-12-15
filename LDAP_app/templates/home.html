@@ -19,6 +19,7 @@
 		<h3>Tools</h3>
 		<a href="{{ url_for('auth.search') }}">Search By Username</a><br>
 		<a href="{{ url_for('auth.all_users') }}">See All Users</a><br>
+		<a href="{{ url_for('auth.all_locked') }}">Locked Accounts</a><br>
 		<a href="{{ url_for('auth.logout') }}">Click here to logout</a>
 	{% else %}
 	<a href="{{ url_for('auth.login') }}">login</a>

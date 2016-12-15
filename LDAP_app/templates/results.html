@@ -2,12 +2,14 @@
 {% block container %}
 	{% block page %}<h3>Results</h3>{% endblock page %}
 		{% block content %}
+		<form action="/editpublicnote" method='post' id="edit_public_btn"></form>
+		<form action="/editprivatenote" method='post' id="edit_private_btn"></form>
 			<table>
 			<tr>
 				<th>User Information</th>
 				<th></th>
-				<th>Public Notes</th>
-				<th>Private Notes</th>
+				<th>Public Note</th>
+				<th>Private Note</th>
 				<th></th>
 			</tr>
 			{% for user in g.user_info %}
@@ -22,9 +24,48 @@
 					<br><br>
 				</td>
 				<td>
+				{% if user[1]['ssccAccountLocked'][0] == 'TRUE' %}
+					<div align='center' style='color:red'>
+					<strong>Locked</strong>
+					</div>
+				{% endif %}
 				</td>
-				<td>Test PubNote</td>
-				<td>Test PrivNote</td>
+				<td style="vertical-align:bottom">
+					<table style="border: 0px !important">
+						<tr>
+							<td style="border: 0px !important">
+								{% for user in g.publicnote.query.filter_by(username=user[1]['uid'][0]) %}
+									{{ user.public }}<br>
+								{% endfor %}
+							</td>
+						</tr>
+						<tr>
+							<td style="vertical-align:bottom; text-align:center; border: 0px !important">
+								<button type='submit' name='edit_public_btn' value="{{ user[1]['uid'][0] }}" form="edit_public_btn" class="btn btn-xs">Edit</button>
+							</td>
+						</tr>
+					</table>
+				</td>
+				<td style="vertical-align:bottom">
+					<table style="border: 0px !important">
+						<tr>
+							<td style="border: 0px !important">
+								{% for user in g.privatenote.query.filter_by(username=user[1]['uid'][0]) %}
+									{% for affil in g.affil %}
+										{% if affil in user.affiliation %}
+											<strong>{{ user.affiliation }}:</strong> {{ user.private }}<br>
+										{% endif %}
+									{% endfor %}
+								{% endfor %}
+							</td>
+						</tr>
+						<tr>
+							<td style="vertical-align:bottom; text-align:center; border: 0px !important">
+								<button type='submit' name='edit_private_btn' value="{{ user[1]['uid'][0] }}" class="btn btn-xs" form="edit_private_btn">Edit</button>
+							</td>
+						</tr>
+					</table>
+				</td>
 				<td>
 				<form action="/sendmail" method='post'>
 					<div class="checkbox">
