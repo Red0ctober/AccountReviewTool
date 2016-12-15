@@ -99,13 +99,13 @@ class SendMessage:
 		self.affiliation = affiliation
 		self.action = action
 		self.users = users
-		receivers = ['ogiramma@ssc.wisc.edu', '%s' % self.sender_email]
+		receivers = ['email@example.com', '%s' % self.sender_email]
 	
 		message = ("""From: Consult <%s> """ % self.sender_email +
-"""To: Oliver <ogiramma@ssc.wisc.edu>
+"""To: Person <email@example.com>
 Subject: Test Email
 
-%s has requested that the SSCC """ % self.sender_name + "%s " %  self.action +
+%s has requested that """ % self.sender_name + "%s " %  self.action +
 "the %s affiliation(s) on the account(s): " % ", ".join(self.affiliation) + "%s" % ', '.join(self.users))
 	
 		try:
